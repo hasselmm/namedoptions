@@ -32,8 +32,8 @@ namespace taschentest {
     const testcase m_test_##Name{this, #Class "::" #Name, &Class::Name}
 
 #ifdef TASCHENTEST_USING_MACROS
-#define COMPARE(Operator, Actual, Expected) TASCHENTEST_COMPARE(Operator, (Actual), (Expected))
-#define VERIFY(Condition)                   TASCHENTEST_VERIFY((Condition))
+#define COMPARE(Operator, Actual, Expected) TASCHENTEST_COMPARE(Operator, Actual, Expected)
+#define VERIFY(Condition)                   TASCHENTEST_VERIFY(Condition)
 #define TESTCASE(Class, Name)               TASCHENTEST_TESTCASE(Class, Name)
 #endif
 
