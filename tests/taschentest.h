@@ -24,7 +24,7 @@ namespace taschentest {
 
 #define TASCHENTEST_TESTCASE(Class, Name) \
     void Name(); \
-    const testcase m_test_##Name{this, #Name, &Class::Name}
+    const testcase m_test_##Name{this, #Class "::" #Name, &Class::Name}
 
 #ifdef TASCHENTEST_USING_MACROS
 #define COMPARE(Operator, Actual, Expected) TASCHENTEST_COMPARE(Operator, (Actual), (Expected))
@@ -43,6 +43,7 @@ protected:
     public:
         template<typename T>
         inline explicit testcase(testsuite *fixture, const std::string &name, void (T::* function)());
+        std::string name() const { return m_name; }
 
         void run();
 
