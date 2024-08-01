@@ -6,4 +6,4 @@ enable_testing()
 add_subdirectory(namedoptions)
 add_subdirectory(tests)
 
-add_custom_target(documentation SOURCES LICENSE README.md)
+add_custom_target(namedoptionsdocs SOURCES LICENSE README.md)
