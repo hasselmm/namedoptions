@@ -1,11 +1,16 @@
 #ifndef TASCHENTEST_H
 #define TASCHENTEST_H
 
-#include <format>
 #include <functional>
 #include <iostream>
 #include <source_location>
 #include <string>
+
+#ifdef __cpp_lib_format
+#include <format>
+#else
+#include "taschenformat.h"
+#endif
 
 namespace taschentest {
 
@@ -93,8 +98,8 @@ void testsuite::assert(bool succeded, const std::string &expression,
     using C = std::common_type_t<T, U>;
 
     assert(succeded, expression,
-           std::format("{}", static_cast<C>(actual_value)),
-           std::format("{}", static_cast<C>(expected_value)),
+           std::format("{0}", static_cast<C>(actual_value)),
+           std::format("{0}", static_cast<C>(expected_value)),
            source);
 }
 

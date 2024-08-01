@@ -8,3 +8,7 @@ add_executable(tst_namedoptions tst_namedoptions.cpp)
 target_link_libraries(tst_namedoptions PRIVATE namedoptions taschentest)
 add_test(NAME tst_namedoptions COMMAND $<TARGET_FILE:tst_namedoptions>)
 
+add_executable(tst_taschenformat tst_taschenformat.cpp)
+target_link_libraries(tst_taschenformat PRIVATE taschentest)
+add_test(NAME tst_taschenformat COMMAND $<TARGET_FILE:tst_taschenformat>)
+
