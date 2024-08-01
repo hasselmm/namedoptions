@@ -2,6 +2,8 @@
 
 #include "taschentest.h"
 
+#include <optional>
+
 namespace named_options::tests {
 namespace {
 
