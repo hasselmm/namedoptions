@@ -8,16 +8,24 @@
 namespace named_options {
 
 template<typename ...Ts>
-class options : public internal::options_variant<Ts...>
+class options
 {
 private:
     static constexpr std::size_t variant_index(std::size_t n) noexcept { return n + 1; }
+    internal::options_variant<Ts...> m_value;
 
 public:
     using variant_type = internal::options_variant<Ts...>;
 
     template<std::size_t N>
     using option_value_type = std::variant_alternative_t<variant_index(N), variant_type>;
+
+    constexpr static std::size_t size()
+    {
+        return std::variant_size_v<variant_type> - variant_index(0);
+    }
+
+    bool operator==(const options &) const = default;
 
     template<std::size_t N, typename T, typename O = options<Ts...>,
              typename OT = internal::option_traits<O, O>>
@@ -30,10 +38,27 @@ public:
         using variant_type  = options::variant_type;
 
         option() = default;
-        option(T &&value) { variant()->template emplace<variant_index()>(std::forward<T>(value)); }
+        option(const T &value) { set_value(value); }
+        option(T &&value) { set_value(std::forward<T>(value)); }
+
+        option &operator=(const T &value) { set_value(value); return *this; }
+        option &operator=(T &&value) { set_value(std::forward<T>(value)); return *this; }
+
+        bool operator==(const option &rhs) const
+        {
+            if (has_value() != rhs.has_value())
+                return false;
+            if (has_value())
+                return value() == rhs.value();
+
+            return true;
+        }
 
         static constexpr std::size_t option_index() noexcept { return N - OT::option_offset; }
         static constexpr std::size_t variant_index() noexcept { return options::variant_index(option_index()); }
+
+        void set_value(const T &new_value) { variant()->template emplace<variant_index()>(new_value); }
+        void set_value(T &&new_value) { variant()->template emplace<variant_index()>(std::forward<T>(new_value)); }
 
         constexpr bool has_value() const { return variant()->index() == variant_index(); }
         constexpr explicit operator bool() const { return has_value(); }
@@ -48,8 +73,8 @@ public:
         constexpr T value_or(U &&default_value) const
         { return *this ? **this : static_cast<T>(std::forward<U>(default_value)); }
 
-        const variant_type *variant() const noexcept { return reinterpret_cast<const variant_type *>(p()); }
-        variant_type *variant() noexcept { return reinterpret_cast<variant_type *>(p()); }
+        const variant_type *variant() const noexcept { return &reinterpret_cast<const options *>(p())->m_value; }
+        variant_type *variant() noexcept { return &reinterpret_cast<options *>(p())->m_value; }
 
         static_assert(option_index() >= 0, "Option index `N` must be within range for `options_type`.");
         static_assert(option_index() < options::size(), "Option index `N` must be within range for `options_type`.");
@@ -69,11 +94,6 @@ public:
                     - offset<O>(N) + option_traits::variant_offset;
         }
     };
-
-    constexpr static std::size_t size()
-    {
-        return std::variant_size_v<variant_type> - variant_index(0);
-    }
 
 private:
     template<typename OT>
